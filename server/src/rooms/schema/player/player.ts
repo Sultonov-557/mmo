@@ -2,7 +2,8 @@ import { Schema, type, view } from "@colyseus/schema";
 import { Vector } from "./vector";
 
 export class Player extends Schema {
-	@type({ type: Vector }) position: Vector;
-	@type({ type: Vector }) velocity: Vector;
-	@type({ type: Vector }) direction: Vector;
+	@type(Vector) position: Vector = new Vector();
+	@type(Vector) direction: Vector = new Vector();
+
+	@type("number") speed: number = 200;
 }

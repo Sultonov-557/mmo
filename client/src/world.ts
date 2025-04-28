@@ -1,17 +1,31 @@
-import { DefaultLoader, Scene } from "excalibur";
-import { TilesetResource } from "@excaliburjs/plugin-tiled";
+import { DefaultLoader, Engine, ImageSource, Scene, SpriteSheet, TileMap, vec } from "excalibur";
 
 export class World extends Scene {
+	public tilemap: TileMap;
+	public tileset?: SpriteSheet;
+	public tilesetSrc: ImageSource = new ImageSource("/tinyBlocks.png");
 	constructor() {
 		super();
+		this.tilemap = new TileMap({ tileHeight: 16, tileWidth: 16, columns: 16, rows: 16 });
+		this.tilemap.scale = vec(5, 5);
 	}
 
 	async onPreLoad(loader: DefaultLoader): Promise<void> {
-		const res = new TilesetResource("/terrain.xml", 1,{});
+		loader.addResource(this.tilesetSrc);
+	}
 
-		loader.addResource(res);
-		loader.onAfterLoad = async () => {
-			console.log(res);
-		};
+	onInitialize(_engine: Engine): void {
+		this.add(this.tilemap);
+
+		this.tileset = SpriteSheet.fromImageSource({
+			image: this.tilesetSrc,
+			grid: { columns: 12, rows: 12, spriteHeight: 16, spriteWidth: 16 },
+		});
+		this.tilemap.tiles.forEach((tile, index) => {
+			if (this.tileset) {
+				console.log(index);
+				tile.addGraphic(this.tileset.sprites[0]);
+			}
+		});
 	}
 }
