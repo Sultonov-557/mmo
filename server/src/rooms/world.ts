@@ -1,7 +1,7 @@
 import { Room, Client } from "@colyseus/core";
 import { WorldState } from "./schema/worldState";
 import { Player } from "./schema/player/player";
-import { Vector } from "./schema/player/vector";
+import { Vector } from "./schema/utils/vector";
 
 export class World extends Room<WorldState> {
 	state = new WorldState();
@@ -24,13 +24,22 @@ export class World extends Room<WorldState> {
 				player.position.x += player.direction.x * player.speed * (delta / 1000);
 				player.position.y += player.direction.y * player.speed * (delta / 1000);
 			}
+
+			const chunkX = Math.floor(player.position.x / this.state.tilemap.chunkSize / this.state.tilemap.tileSize);
+			const chunkY = Math.floor(player.position.y / this.state.tilemap.chunkSize / this.state.tilemap.tileSize);
+			const generateRadius = 1;
+			for (let x = chunkX - generateRadius; x <= chunkX + generateRadius; x++) {
+				for (let y = chunkY - generateRadius; y <= chunkY + generateRadius; y++) {
+					this.state.tilemap.getChunk(x, y);
+				}
+			}
 		});
 	}
 
 	onJoin(client: Client, options: any) {
 		console.log(client.sessionId, "joined!");
 		const player = new Player();
-		player.position = new Vector(500, 500);
+		player.position = new Vector(0, 0);
 		this.state.players.set(client.sessionId, player);
 	}
 

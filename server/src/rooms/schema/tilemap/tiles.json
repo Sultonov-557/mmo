@@ -1,0 +1,18 @@
+{
+    "dirt": {
+        "tileset": "dirt",
+        "texturePos": {
+            "x": 1,
+            "y": 1
+        },
+        "walkable": true
+    },
+    "water": {
+        "tileset": "water",
+        "texturePos": {
+            "x": 0,
+            "y": 0
+        },
+        "walkable": false
+    }
+}

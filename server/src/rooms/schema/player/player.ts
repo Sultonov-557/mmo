@@ -1,5 +1,5 @@
 import { Schema, type, view } from "@colyseus/schema";
-import { Vector } from "./vector";
+import { Vector } from "../utils/vector";
 
 export class Player extends Schema {
 	@type(Vector) position: Vector = new Vector();

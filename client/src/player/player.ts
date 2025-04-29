@@ -1,18 +1,30 @@
 import { Room } from "colyseus.js";
-import { Actor, Color, Engine, Keys, vec, Vector } from "excalibur";
+import { Actor, Color, Engine, Keys, SpriteSheet, vec, Vector } from "excalibur";
+import { World } from "../world/world";
 
 export class Player extends Actor {
 	private speed: number = 200; // pixels per second
-	private isControlled: boolean;
 	public moveDir: Vector = vec(0, 0);
 	private goto?: Vector;
 
-	constructor(data: any, public state?: any, public room?: Room) {
-		const isControlled = !!room;
-		super({ height: 20, width: 20, color: isControlled ? Color.Green : Color.Red, pos: data.pos, z: 1 });
-		this.isControlled = isControlled;
+	constructor(data: any, public world: World, private isControlled = false) {
+		super({
+			height: 16,
+			width: 16,
+			color: isControlled ? Color.Green : Color.Red,
+			pos: data.pos,
+			z: 1,
+		});
+
+		const idle = SpriteSheet.fromImageSource({
+			image: world.playerSprites.idle,
+			grid: { columns: 4, rows: 4, spriteHeight: 20, spriteWidth: 16 },
+			spacing: { margin: { x: 3, y: 5 }, originOffset: { x: 3, y: 5 } },
+		});
+		this.graphics.add(idle.getSprite(0, 0));
+
 		this.speed = data.speed;
-		this.state(data.position).onChange(() => {
+		this.world.state(data.position).onChange(() => {
 			if (isControlled) {
 				if (data.position.x != this.pos.x && data.position.y != this.pos.y) {
 					this.pos = vec(data.position.x, data.position.y).average(this.pos);
@@ -24,7 +36,7 @@ export class Player extends Actor {
 
 		if (isControlled) {
 			setInterval(() => {
-				room.send("move", { x: this.moveDir.x, y: this.moveDir.y });
+				this.world.room.send("move", { x: this.moveDir.x, y: this.moveDir.y });
 			}, 16);
 		}
 	}
